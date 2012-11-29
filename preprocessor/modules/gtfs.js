@@ -118,6 +118,9 @@ exports.GTFS = function (foldername) {
 	convertFields( tables.calendar, ['start_date','end_date'], parsers.date);
 	convertFields( tables.calendar, ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], parsers.integer);
 	
+	convertFields( tables.stops, ['stop_lat', 'stop_lon'], parsers.number);
+	convertFields( tables.stops, ['stop_name'], parsers.text);
+	
 	if (tables.calendar_dates) {
 		convertFields( tables.calendar_dates, ['date'], parsers.date);
 		convertFields( tables.calendar_dates, ['exception_type'], parsers.integer);

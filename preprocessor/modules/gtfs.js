@@ -43,6 +43,19 @@ exports.GTFS = function (foldername) {
 		}
 	} 
 	
+	var mapFields = function(table, fields) {
+		var result = [];
+		for (var i = 0; i < table.length; i++) {
+			var entry = table[i];
+			var o = {};
+			for (var old in fields) {
+				o[fields[old]] = entry[old];
+			}
+			result.push(o);
+		}
+		return result;
+	} 
+	
 	// Schmeiß alles weg, was nicht an den angegebenen Datumsen stattfindet
 	me.useOnly = function (minDate, maxDate) {
 		// Welche Datumse sollen berücksichtigt werden?

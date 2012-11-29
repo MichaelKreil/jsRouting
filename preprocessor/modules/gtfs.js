@@ -63,15 +63,22 @@ function readCSV(filename, required) {
 		// Kopfzeile extrahieren;
 		var head = lines.shift();
 		
-		// Zeilen als Object
+		// Zeilen werden zu Objekten
+		var n = 0;
 		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
-			var obj = {};
-			for (var j = 0; j < head.length; j++) {
-				obj[head[j]] = line[j];
+			if (line != '') {
+				var obj = {};
+				for (var j = 0; j < head.length; j++) {
+					obj[head[j]] = line[j];
+				}
+				lines[n] = obj;
+				n++;
 			}
-			lines[i] = obj;
 		}
+		
+		// ungenutzte Zeilen entfernen
+		lines.length = n;
 		
 		return lines;
 	} else {

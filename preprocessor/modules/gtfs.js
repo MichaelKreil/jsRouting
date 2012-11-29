@@ -3,6 +3,12 @@ var path = require('path');
 
 exports.GTFS = function (foldername) {
 	var me = this;
+	me.foldername = foldername;
+
+	// Welche Ids sollen berücksichtigt werden?
+	var usedServiceIds = {};
+	var usedRouteIds = {};
+	var usedTripIds = {};
 	
 	// Überprüfe mal die Daten, ob alles in Ordnung ist. 
 	me.check = function () {
@@ -63,7 +69,9 @@ exports.GTFS = function (foldername) {
 		maxDate = parsers.date(maxDate);
 
 		// Welche ServiceIds sollen berücksichtigt werden?
-		var usedServiceIds = {};
+		usedServiceIds = {};
+		usedRouteIds = {};
+		usedTripIds = {};
 		
 		// Anhand von calendar
 		for (var i = 0; i < tables.calendar.length; i++) {
@@ -79,24 +87,101 @@ exports.GTFS = function (foldername) {
 		}
 		
 		// Jetzt alle Ausnahmen aus calendar_dates berücksichtigen
-		if (tables.calendar_dates) {
-			for (var i = 0; i < tables.calendar_dates.length; i++) {
-				var entry = tables.calendar_dates[i];
-				if ((minDate <= entry.date) && (entry.date <= maxDate)) {
-					usedServiceIds[entry.service_id] = (entry.exception_type == 1); 
-				} 
+		for (var i = 0; i < tables.calendar_dates.length; i++) {
+			var entry = tables.calendar_dates[i];
+			if ((minDate <= entry.date) && (entry.date <= maxDate)) {
+				usedServiceIds[entry.service_id] = (entry.exception_type == 1); 
+			} 
+		}
+		
+		// Damit jetzt calendar_dates filtern
+		console.log('calendar_dates filtern');
+		var t = tables.calendar_dates;
+		tables.calendar_dates = [];
+		for (var i = 0; i < t.length; i++) {
+			var entry = t[i];
+			if ((minDate <= entry.date) && (entry.date <= maxDate) && (usedServiceIds[entry.service_id])) {
+				tables.calendar_dates.push(entry);
 			}
 		}
 		
-		// Damit jetzt trips filtern
-		//console.log(usedServiceIds);
+		// Welche trips werden verwendet?
+		console.log('trips filtern');
+		var t = tables.trips;
+		tables.trips = [];
+		for (var i = 0; i < t.length; i++) {
+			var entry = t[i];
+			if (usedServiceIds[entry.service_id]) {
+				usedRouteIds[entry.route_id] = true;
+				usedTripIds[entry.trip_id] = true;
+				tables.trips.push(entry);
+			}
+		}
 		
+		// Welche Routen werden verwendet
+		console.log('routes filtern');
+		var t = tables.routes;
+		tables.routes = [];
+		for (var i = 0; i < t.length; i++) {
+			var entry = t[i];
+			if (usedRouteIds[entry.route_id]) {
+				tables.routes.push(entry);
+			}
+		}
+		
+		// Jetzt erst stop_times importieren
+		console.log('stop_times importieren');
+		var lines = readCSV(foldername + '/stop_times.txt', true, true);
+		var stop_times = [];
+		var head = parseCSVLine(lines[0]);
+		var tripIdIndex;
+		
+		for (var i = 0; i < head.length; i++) {
+			if (head[i] == 'trip_id') tripIdIndex = i;
+		}
+		
+		for (var i = 1; i < lines.length; i++) {
+			entry = parseCSVLine(lines[i]);
+			if (usedTripIds[entry[tripIdIndex]]) {
+				stop_times.push(entry);
+			}
+			if (i % 300000 == 0) {
+				console.log((100*i/lines.length).toFixed(1) + '% untersucht, davon ' + (100*stop_times.length/i).toFixed(1) + '% genutzt');
+			}
+		}
+		
+		delete lines;
+		
+		// Zeilen werden zu Objekten
+		var n = 0;
+		var temp = [head];
+		for (var i = 0; i < stop_times.length; i++) {
+			var line = stop_times[i];
+			if (line != '') {
+				var obj = {};
+				for (var j = 0; j < head.length; j++) {
+					obj[head[j]] = line[j];
+				}
+				stop_times[n] = obj;
+				n++;
+				if (obj.stop_id == '9170001') {
+					temp.push(line);
+				}
+			}
+		}
+		
+		// ungenutzte Zeilen entfernen
+		stop_times.length = n;
+		
+		fs.writeFileSync('temp.csv', temp.join('\r'), 'utf8');
+		
+		
+		//'stop_times':      readCSV(foldername + '/stop_times.txt', true),
 	}
 	
 	// Zum Schluss können wir erst die stop_times einlesen und alles als JSON ausgeben.
 	me.export = function (filename) {
 		console.log('Export "'+filename+'"');
-		//'stop_times':      readCSV(foldername + '/stop_times.txt', true),
 		
 		var result = {};
 		
@@ -129,11 +214,14 @@ exports.GTFS = function (foldername) {
 	};
 	
 	// Jetzt die entsprechenden Felder konvertieren
+	console.log('Felder konvertieren');
 	convertFields( tables.calendar, ['start_date','end_date'], parsers.date);
 	convertFields( tables.calendar, ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], parsers.integer);
 	
 	convertFields( tables.stops, ['stop_lat', 'stop_lon'], parsers.number);
 	convertFields( tables.stops, ['stop_name'], parsers.text);
+	
+	convertFields( tables.trips, ['trip_headsign','trip_short_name'], parsers.text);
 	
 	if (tables.calendar_dates) {
 		convertFields( tables.calendar_dates, ['date'], parsers.date);
@@ -183,7 +271,7 @@ function parseCSVLine(line) {
 	}
 }
 
-function readCSV(filename, required) {
+function readCSV(filename, required, dontParseLines) {
 	filename = path.normalize(filename);
 	if (fs.existsSync(filename)) {
 		console.log('Lese "'+filename+'"');
@@ -195,30 +283,32 @@ function readCSV(filename, required) {
 		file = file.replace(/[\n\r]+/g, '\r');
 		var lines = file.split('\r');
 		
-		// Zeilen parsen
-		for (var i = 0; i < lines.length; i++) {
-			lines[i] = parseCSVLine(lines[i]);
-		}
-		
-		// Kopfzeile extrahieren;
-		var head = lines.shift();
-		
-		// Zeilen werden zu Objekten
-		var n = 0;
-		for (var i = 0; i < lines.length; i++) {
-			var line = lines[i];
-			if (line != '') {
-				var obj = {};
-				for (var j = 0; j < head.length; j++) {
-					obj[head[j]] = line[j];
-				}
-				lines[n] = obj;
-				n++;
+		if (!dontParseLines) {
+			// Zeilen parsen
+			for (var i = 0; i < lines.length; i++) {
+				lines[i] = parseCSVLine(lines[i]);
 			}
+			
+			// Kopfzeile extrahieren;
+			var head = lines.shift();
+			
+			// Zeilen werden zu Objekten
+			var n = 0;
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				if (line != '') {
+					var obj = {};
+					for (var j = 0; j < head.length; j++) {
+						obj[head[j]] = line[j];
+					}
+					lines[n] = obj;
+					n++;
+				}
+			}
+			
+			// ungenutzte Zeilen entfernen
+			lines.length = n;
 		}
-		
-		// ungenutzte Zeilen entfernen
-		lines.length = n;
 		
 		return lines;
 	} else {

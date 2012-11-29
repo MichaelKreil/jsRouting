@@ -20,6 +20,16 @@ exports.GTFS = function (foldername) {
 		},
 		integer: function (text) {
 			return parseInt(text, 10)
+		},
+		number: function (text) {
+			return parseFloat(text)
+		},
+		text: function (text) {
+			text = text.replace(/^\s*|\s*$/g, '');
+			if (text.substr(0,1) == '"') {
+				text = text.substr(1, text.length - 2);
+			} 
+			return text
 		}
 	}
 	

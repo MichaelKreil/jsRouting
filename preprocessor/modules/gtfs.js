@@ -4,6 +4,11 @@ var path = require('path');
 exports.GTFS = function (foldername) {
 	var me = this;
 	
+	// Überprüfe mal die Daten, ob alles in Ordnung ist. 
+	me.check = function () {
+		
+	}
+	 
 	// Parser brauchen wir, um die Textfelder in die entsprechenden Datenformate zu konvertieren.
 	var parsers = {
 		// parsed ein Datum von Format YYYYMMDD
@@ -17,6 +22,39 @@ exports.GTFS = function (foldername) {
 			return parseInt(text, 10)
 		}
 	}
+	
+	// Wendet eine Funktion auf ein Feld einer Tabelle an.
+	var convertFields = function (table, fields, func) {
+		for (var j = 0; j < fields.length; j++) {
+			var field = fields[j];
+			for (var i = 0; i < table.length; i++) {
+				table[i][field] = func(table[i][field])
+			}
+		}
+	} 
+	
+	// Schmeiß alles weg, was nicht an den angegebenen Datumsen stattfindet
+	me.useOnly = function (dates) {
+		// Welche Datumse sollen berücksichtigt werden?
+		var usedDates = [];
+		for (var i = 0; i < dates.length; i++) {
+			usedDates[parsers.date(dates[i])] = true;
+		}
+
+		// Welche ServiceIds sollen berücksichtigt werden?
+		var usedServiceIds = {};
+		
+		// Anhand von calendar
+		for (var i = 0; i < tables.calendar.length; i++) {
+			
+		}
+	}
+	
+	// Zum Schluss können wir erst die stop_times einlesen und alles als JSON ausgeben.
+	me.export = function (filename) {
+		//'stop_times':      readCSV(foldername + '/stop_times.txt', true),
+	}
+	
 	// Lese GTFS-Daten ... alle, außer "stop_times" ... denn die ist so fett, dass sie später geparsed wird.
 	var tables = {
 		'agency':          readCSV(foldername + '/agency.txt', true),
@@ -33,19 +71,13 @@ exports.GTFS = function (foldername) {
 		'trips':           readCSV(foldername + '/trips.txt', true)
 	};
 	
-	// Überprüfe mal die Daten, ob alles in Ordnung ist. 
-	me.check = function () {
-		
-	}
+	// Jetzt die entsprechenden Felder konvertieren
+	convertFields( tables.calendar, ['start_date','end_date'], parsers.date);
+	convertFields( tables.calendar, ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], parsers.integer);
 	
-	// Schmeiß alles weg, was nicht an den angegebenen Datumsen stattfindet
-	me.useOnly = function (dates) {
-		
-	}
-	
-	// Zum Schluss können wir erst die stop_times einlesen und alles als JSON ausgeben.
-	me.export = function (filename) {
-		//'stop_times':      readCSV(foldername + '/stop_times.txt', true),
+	if (tables.calendar_dates) {
+		convertFields( tables.calendar_dates, ['date'], parsers.date);
+		convertFields( tables.calendar_dates, ['exception_type'], parsers.integer);
 	}
 	
 	return me;

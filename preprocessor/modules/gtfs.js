@@ -95,7 +95,21 @@ exports.GTFS = function (foldername) {
 	
 	// Zum Schluss können wir erst die stop_times einlesen und alles als JSON ausgeben.
 	me.export = function (filename) {
+		console.log('Export "'+filename+'"');
 		//'stop_times':      readCSV(foldername + '/stop_times.txt', true),
+		
+		var result = {};
+		
+		result.stops = mapFields(tables.stops, {
+			'stop_name':'name',
+			'stop_lat':'lat',
+			'stop_lon':'lon'
+		});
+		
+		//result = JSON.stringify(result, null, '\t');
+		result = JSON.stringify(result);
+		result = 'var gtfs = '+result;
+		fs.writeFileSync(filename, result, 'utf8');
 	}
 	
 	// Lese GTFS-Daten ... alle, außer "stop_times" ... denn die ist so fett, dass sie später geparsed wird.

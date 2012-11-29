@@ -127,8 +127,43 @@ exports.GTFS = function (foldername) {
 }
 
 function parseCSVLine(line) {
-	// Da gibt es bestimmt noch Foo mit Kommata in Strings zwischen Gänsefüßchen :/
-	return line.split(',');
+	if (line.indexOf('"') < 0) {
+		return line.split(',');
+	} else {
+		// Shit, Gänsefüßchen!!EINSELF!!
+		// Jetzt muss die Zeile per Hand entpopelt werden.
+		var fields = [];
+		var inString = false;
+		var s = '';
+		for (var i = 0; i < line.length; i++) {
+			var c = line.charAt(i);
+			if (inString) {
+				switch (c) {
+					case '\\': // Ignorier mal
+					break;
+					case '"': // Feld zuende
+						inString = false;
+					break;
+					default:
+						s += c;
+				}
+			} else {
+				switch (c) {
+					case ',':
+						fields.push(s);
+						s = '';
+					break;
+					case '"':
+						inString = true;
+					break;
+					default:
+						s += c;
+				}
+			}
+		}
+		fields.push(s);
+		return fields;
+	}
 }
 
 function readCSV(filename, required) {

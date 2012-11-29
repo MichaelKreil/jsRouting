@@ -23,29 +23,32 @@ Map.prototype.setData = function (data) {
         }.bind(this));
         marker.addTo(this.layer);
     }.bind(this));
-    this.layyer.addTo(this.map);
+    this.layer.addTo(this.map);
     this.map.fitBounds(bounds);
 };
 
 function createMarker (data, isBig) {
+    // stop - props:    stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
+
+
     if (isBig) {
         var icon = new L.DivIcon({
             className: 'marker',
             html: '<div class="label-small">' +
-                '<div class="icon16" style="background-color#333399;"></div>' +
-                '<div class="text">' + ellipsis(data.name, 35) + '</div>' +
+                '<div class="icon16" style="background-color:#333399;"></div>' +
+                '<div class="text">' + ellipsis(data.stop_name, 35) + '</div>' +
             '</div>',
             iconSize: [50, 50],
             iconAnchor: [25, 25]
         });
-        return new L.Marker(new L.LatLng(data.lat, data.lon), { icon: icon });
+        return new L.Marker(new L.LatLng(data.stop_lat, data.stop_lon), { icon: icon });
     }
 
-    return new L.CircleMarker(new L.LatLng(data.lat, data.lon), {
+    return new L.CircleMarker(new L.LatLng(data.stop_lat, data.stop_lon), {
         clickable: true,
         size: 50,
         fill: true,
-        fillColor: data.color,
+        fillColor: '#333399',
         stroke: false,
         fillOpacity: 0.8
     });

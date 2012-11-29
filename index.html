@@ -5,9 +5,9 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css">
-        <!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" /><![endif]-->
-        <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
+        <link rel="stylesheet" href="leaflet/leaflet-0.4.5.css">
+        <!--[if lte IE 8]><link rel="stylesheet" href="leaflet/leaflet-0.4.5.ie.css" /><![endif]-->
+        <script src="leaflet/leaflet-0.4.5.js"></script>
 
         <script src="main.js"></script>
         <script src="map.js"></script>
@@ -21,7 +21,12 @@
     <body>
     <div class="map"></div>
     <script>
-        var map = new Map($('.map'));
+    var map = new Map($('.map'));
+    map.setData([
+        { stop_name: 'TEST1', stop_lat: 52.5201, stop_lon: 13.37 },
+        { stop_name: 'TEST2', stop_lat: 52.5202, stop_lon: 13.37 },
+        { stop_name: 'TEST3', stop_lat: 52.5203, stop_lon: 13.37 }
+    ]);
     </script>
     </body>
 </html>

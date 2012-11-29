@@ -4,6 +4,19 @@ var path = require('path');
 exports.GTFS = function (foldername) {
 	var me = this;
 	
+	// Parser brauchen wir, um die Textfelder in die entsprechenden Datenformate zu konvertieren.
+	var parsers = {
+		// parsed ein Datum von Format YYYYMMDD
+		// Das Ergebnis ist eine fortlaufende Zahl an Tagen, wo bei gilt:
+		// date % 7 == 0 ... für Montage
+		date: function (text) {
+			var date = new Date(text.substr(0,4), parseInt(text.substr(4,2))-1, text.substr(6,2));
+			return Math.round(date / 86400000)+3;
+		},
+		integer: function (text) {
+			return parseInt(text, 10)
+		}
+	}
 	// Lese GTFS-Daten ... alle, außer "stop_times" ... denn die ist so fett, dass sie später geparsed wird.
 	var tables = {
 		'agency':          readCSV(foldername + '/agency.txt', true),

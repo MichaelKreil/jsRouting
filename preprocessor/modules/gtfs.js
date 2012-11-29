@@ -34,20 +34,40 @@ exports.GTFS = function (foldername) {
 	} 
 	
 	// Schmeiß alles weg, was nicht an den angegebenen Datumsen stattfindet
-	me.useOnly = function (dates) {
+	me.useOnly = function (minDate, maxDate) {
 		// Welche Datumse sollen berücksichtigt werden?
-		var usedDates = [];
-		for (var i = 0; i < dates.length; i++) {
-			usedDates[parsers.date(dates[i])] = true;
-		}
+		minDate = parsers.date(minDate);
+		maxDate = parsers.date(maxDate);
 
 		// Welche ServiceIds sollen berücksichtigt werden?
 		var usedServiceIds = {};
 		
 		// Anhand von calendar
 		for (var i = 0; i < tables.calendar.length; i++) {
-			
+			var entry = tables.calendar[i];
+			if ((minDate <= entry.end_date) && (entry.start_date <= maxDate)) {
+				var weekdays = [entry.monday, entry.tuesday, entry.wednesday, entry.thursday, entry.friday, entry.saturday, entry.sunday];
+				for (var d = minDate; d <= maxDate; d++) {
+					if ((entry.start_date <= d) && (d <= entry.end_date) && (weekdays[d % 7] > 0)) {
+						usedServiceIds[entry.service_id] = true;
+					}
+				}
+			}
 		}
+		
+		// Jetzt alle Ausnahmen aus calendar_dates berücksichtigen
+		if (tables.calendar_dates) {
+			for (var i = 0; i < tables.calendar_dates.length; i++) {
+				var entry = tables.calendar_dates[i];
+				if ((minDate <= entry.date) && (entry.date <= maxDate)) {
+					usedServiceIds[entry.service_id] = (entry.exception_type == 1); 
+				} 
+			}
+		}
+		
+		// Damit jetzt trips filtern
+		//console.log(usedServiceIds);
+		
 	}
 	
 	// Zum Schluss können wir erst die stop_times einlesen und alles als JSON ausgeben.

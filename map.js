@@ -10,46 +10,24 @@ function Map(container) {
 
     this.layer = new L.LayerGroup();
     this.layer.addTo(this.map);
-
-    this.selectedMarker = null;
 }
 
 Map.prototype.setData = function (data) {
     var bounds = [];
+    this.map.removeLayer(this.layer);
     this.layer.clearLayers();
-// removelayer
     data.forEach(function (poi) {
         bounds.push([poi.lat, poi.lon]);
-        var marker = new Marker(poi);
+        var marker = createMarker(poi);
         marker.on('click', function (e) {
-            this.deactivateAllMarkers();
-            marker.activate();
-            this.selectedMarker = marker;
         }.bind(this));
         marker.addTo(this.layer);
     }.bind(this));
-
-// addlayer
-
-    if (this.selectedMarker) {
-        this.selectedMarker.activate();
-    }
-
-    bounds.push([favData[i].lat, favData[i].lon]);
+    this.layyer.addTo(this.map);
     this.map.fitBounds(bounds);
 };
 
-Map.prototype.deactivateAllMarkers = function () {
-    if (this.selectedMarker) {
-        this.selectedMarker.deactivate();
-        this.selectedMarker = null;
-    }
-};
-
-
-function Marker (data, isBig) {
-    var marker;
-
+function createMarker (data, isBig) {
     if (isBig) {
         var icon = new L.DivIcon({
             className: 'marker',
@@ -60,36 +38,15 @@ function Marker (data, isBig) {
             iconSize: [50, 50],
             iconAnchor: [25, 25]
         });
-        marker = new L.Marker(new L.LatLng(data.lat, data.lon), { icon: icon });
-    } else {
-        marker = new L.SquareMarker(new L.LatLng(data.lat, data.lon), {
-            clickable: true,
-            size: 50,
-            fill: true,
-            fillColor: data.color,
-            stroke: false,
-            fillOpacity: 0.8
-        });
+        return new L.Marker(new L.LatLng(data.lat, data.lon), { icon: icon });
     }
 
-    marker.on('click', function () {
+    return new L.CircleMarker(new L.LatLng(data.lat, data.lon), {
+        clickable: true,
+        size: 50,
+        fill: true,
+        fillColor: data.color,
+        stroke: false,
+        fillOpacity: 0.8
     });
-
-    marker.addTo(layer);
-
-    this.marker = marker;
-
-    return marker;
 }
-
-Marker.prototype.activate = function () {
-    var m = this.marker;
-    m.setZIndexOffset && m.setZIndexOffset(1000);
-    m._icon && m._icon.classList.add('active');
-};
-
-Marker.prototype.deactivate = function () {
-    var m = this.marker;
-    m.setZIndexOffset && m.setZIndexOffset(0);
-    m._icon && m._icon.classList.remove('active');
-};

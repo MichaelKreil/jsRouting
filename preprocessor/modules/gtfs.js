@@ -3,7 +3,7 @@ var path = require('path');
 
 exports.GTFS = function (foldername) {
 	var me = this;
-	
+
 	// Lese GTFS-Daten:
 	var tables = {
 		'agency':          readCSV(foldername + '/agency.txt', true),
@@ -30,31 +30,30 @@ function parseCSVLine(line) {
 function readCSV(filename, required) {
 	filename = path.normalize(filename);
 	if (fs.existsSync(filename)) {
-		
+
 		// Datei lesen
 		var file = fs.readFileSync(filename, 'utf-8');
-		
+
 		// In Zeilen zerlegen
 		file = file.replace(/[\n\r]+/g, '\r');
 		var lines = file.split('\r');
-		
+
 		// Zeilen parsen
 		for (var i = 0; i < lines.length; i++) lines[i] = parseCSVLine(lines[i]);
-		
+
 		// Kopfzeile extrahieren;
 		var head = lines.shift();
-		
+
 		// Zeilen werden zu Objekten
 		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
 			var object = {};
 			for (var j = 0; j < head.length; j++) {
-				object[head[j]] = line[j];
+				object[head[j]] = line[j].replace(/^"|"$/g, '');
 			}
 			lines[i] = object;
 		}
-		
-		
+
 		return {
 			head:head,
 			lines:lines

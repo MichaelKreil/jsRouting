@@ -9,8 +9,9 @@
         <!--[if lte IE 8]><link rel="stylesheet" href="leaflet/leaflet-0.4.5.ie.css" /><![endif]-->
         <script src="leaflet/leaflet-0.4.5.js"></script>
 
-        <script src="main.js"></script>
+        <script src="data/gtfs.js"></script>
         <script src="map.js"></script>
+        <script src="main.js"></script>
 
         <style>
         body { margin: 0; padding: 0; }
@@ -22,11 +23,7 @@
     <div class="map"></div>
     <script>
     var map = new Map($('.map'));
-    map.setData([
-        { stop_name: 'TEST1', stop_lat: 52.5201, stop_lon: 13.37 },
-        { stop_name: 'TEST2', stop_lat: 52.5202, stop_lon: 13.37 },
-        { stop_name: 'TEST3', stop_lat: 52.5203, stop_lon: 13.37 }
-    ]);
+    map.setData(gtfs.stops);
     </script>
     </body>
 </html>

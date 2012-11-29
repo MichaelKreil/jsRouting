@@ -12,13 +12,13 @@ Außerdem kann der Routing-Algorithmus weiterentwickelt werden, um auch Spezialf
 # Wie funktioniert's?
 
 1. /preprocessor/ (node.js)
-	a. Die [GTFS](https://developers.google.com/transit/gtfs/reference)-Daten werden eingelesen.
-	b. Die Daten werden geprüft.
-	c. Es werden die Daten ermittelt, die für die nächsten 48 Stunden relevant sind.
-	d. Die relevanten Daten werden dann als JSON ausgegeben.
+   a. Die [GTFS](https://developers.google.com/transit/gtfs/reference)-Daten werden eingelesen.
+   b. Die Daten werden geprüft.
+   c. Es werden die Daten ermittelt, die für die nächsten 48 Stunden relevant sind.
+   d. Die relevanten Daten werden dann als JSON ausgegeben.
 2. /webapp/ (HTML, CSS, JavaScript)
-	a. Hier wird dann auf der Basis des JSONs das Routing durchgeführt
-	b. Als Darstellung ist unter anderem eine Karte z.B. auf der Basis von Leaflet geplant.
+   a. Hier wird dann auf der Basis des JSONs das Routing durchgeführt
+   b. Als Darstellung ist unter anderem eine Karte z.B. auf der Basis von Leaflet geplant.
 
 # Installation
 

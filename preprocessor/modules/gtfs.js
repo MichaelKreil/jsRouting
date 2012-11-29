@@ -24,6 +24,10 @@ exports.GTFS = function (foldername) {
 			var date = new Date(text.substr(0,4), parseInt(text.substr(4,2))-1, text.substr(6,2));
 			return Math.round(date / 86400000)+3;
 		},
+		time: function (text) {
+			var value = text.split(':');
+			return parseInt(value[0], 10)*3600 + parseInt(value[1], 10)*60 + parseInt(value[2], 10);
+		},
 		integer: function (text) {
 			return parseInt(text, 10)
 		},

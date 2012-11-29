@@ -1,0 +1,1 @@
+var gtfs = require('./modules/gtfs').GTFS('../data/GTFS_VBB_Okt2012');

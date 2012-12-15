@@ -99,7 +99,7 @@ exports.GTFS = function (foldername) {
 		}
 		
 		// Damit jetzt calendar_dates filtern
-		console.log('calendar_dates filtern');
+		log('calendar_dates filtern', 1);
 		var t = tables.calendar_dates;
 		tables.calendar_dates = [];
 		for (var i = 0; i < t.length; i++) {
@@ -110,7 +110,7 @@ exports.GTFS = function (foldername) {
 		}
 		
 		// Welche trips werden verwendet?
-		console.log('trips filtern');
+		log('trips filtern', 1);
 		var t = tables.trips;
 		tables.trips = [];
 		for (var i = 0; i < t.length; i++) {
@@ -123,7 +123,7 @@ exports.GTFS = function (foldername) {
 		}
 		
 		// Welche Routen werden verwendet
-		console.log('routes filtern');
+		log('routes filtern', 1);
 		var t = tables.routes;
 		tables.routes = [];
 		for (var i = 0; i < t.length; i++) {
@@ -134,7 +134,7 @@ exports.GTFS = function (foldername) {
 		}
 		
 		// Jetzt erst stop_times importieren
-		console.log('stop_times importieren');
+		log('stop_times importieren', 1);
 		var lines = readCSV(foldername + '/stop_times.txt', true, true);
 		var stop_times = [];
 		var head = parseCSVLine(lines[0]);
@@ -150,7 +150,7 @@ exports.GTFS = function (foldername) {
 				stop_times.push(entry);
 			}
 			if (i % 300000 == 0) {
-				console.log((100*i/lines.length).toFixed(1) + '% untersucht, davon ' + (100*stop_times.length/i).toFixed(1) + '% genutzt');
+				log((100*i/lines.length).toFixed(1) + '% untersucht, davon ' + (100*stop_times.length/i).toFixed(1) + '% genutzt', 2);
 			}
 		}
 		
@@ -185,7 +185,7 @@ exports.GTFS = function (foldername) {
 	
 	// Zum Schluss können wir erst die stop_times einlesen und alles als JSON ausgeben.
 	me.export = function (filename) {
-		console.log('Export "'+filename+'"');
+		log('Export "'+filename+'"', 0);
 		
 		var result = {};
 		
@@ -218,7 +218,7 @@ exports.GTFS = function (foldername) {
 	};
 	
 	// Jetzt die entsprechenden Felder konvertieren
-	console.log('Felder konvertieren');
+	log('Felder konvertieren', 1);
 	convertFields( tables.calendar, ['start_date','end_date'], parsers.date);
 	convertFields( tables.calendar, ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], parsers.integer);
 	
@@ -278,12 +278,13 @@ function parseCSVLine(line) {
 function readCSV(filename, required, dontParseLines) {
 	filename = path.normalize(filename);
 	if (fs.existsSync(filename)) {
-		console.log('Lese "'+filename+'"');
 		
 		// Datei lesen
+		log('Lese "'+filename+'"', 1);
 		var file = fs.readFileSync(filename, 'utf-8');
 		
 		// In Zeilen zerlegen
+		log('Zerlege in Zeilen', 2);
 		file = file.replace(/[\n\r]+/g, '\r');
 		var lines = file.split('\r');
 		
@@ -297,6 +298,7 @@ function readCSV(filename, required, dontParseLines) {
 			var head = lines.shift();
 			
 			// Zeilen werden zu Objekten
+			log('Zeilen parsen', 2);
 			var n = 0;
 			for (var i = 0; i < lines.length; i++) {
 				var line = lines[i];
@@ -317,8 +319,13 @@ function readCSV(filename, required, dontParseLines) {
 		return lines;
 	} else {
 		if (required) {
-			console.error('"'+filename+'" is required but not found.')
+			log('"'+filename+'" is required but not found.', 0)
 		}
 		return undefined;
 	}
+}
+
+var tabs = '                              ';
+function log(msg, level) {
+	console.log(tabs.substr(0,level*3) + msg);
 }

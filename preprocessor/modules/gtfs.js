@@ -275,7 +275,11 @@ function parseCSVLine(line) {
 	}
 }
 
-function readCSV(filename, required, dontParseLines) {
+
+// filename: Dateiname der CSV
+// required: Zeige Fehler, wenn die Datei nicht vorhanden ist
+// callback: (optional) wird für jede Zeile aufgerufen, um zu checken, ob die Zeile verwendet werden soll.
+function readCSV(filename, required, callback) {
 	filename = path.normalize(filename);
 	if (fs.existsSync(filename)) {
 		
@@ -288,35 +292,36 @@ function readCSV(filename, required, dontParseLines) {
 		file = file.replace(/[\n\r]+/g, '\r');
 		var lines = file.split('\r');
 		
-		if (!dontParseLines) {
-			// Kopfzeile extrahieren;
-			var head = parseCSVLine(lines.shift());
+		// Kopfzeile extrahieren;
+		var head = parseCSVLine(lines.shift());
+		
+		// Zeilen parsen
+		log('Zeilen parsen', 2);
+		var n = 0;
+		for (var i = 0; i < lines.length; i++) {
+			var line = lines[i];
 			
-			// Zeilen parsen
-			log('Zeilen parsen', 2);
-			var n = 0;
-			for (var i = 0; i < lines.length; i++) {
-				var line = lines[i];
+			if (line != '') {
+				line = parseCSVLine(line);
 				
-				if (line != '') {
-					line = parseCSVLine(line);
-					
-					var obj = {};
-					for (var j = 0; j < head.length; j++) {
-						obj[head[j]] = line[j];
-					}
+				var obj = {};
+				for (var j = 0; j < head.length; j++) {
+					obj[head[j]] = line[j];
+				}
+				
+				if ((callback === undefined) || callback(obj)) {
 					lines[n] = obj;
 					n++;
-					
-					if (n % 100000 == 0) {
-						log('Zeile Nr.'+n, 3);
-					}
 				}
 			}
-			
-			// ungenutzte Zeilen entfernen
-			lines.length = n;
+				
+			if (i % 100000 == 0) {
+				log('Zeile Nr. '+i, 3);
+			}
 		}
+		
+		// ungenutzte Zeilen entfernen
+		lines.length = n;
 		
 		return lines;
 	} else {

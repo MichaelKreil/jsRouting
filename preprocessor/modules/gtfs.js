@@ -132,7 +132,23 @@ exports.GTFS = function (foldername) {
 				tables.routes.push(entry);
 			}
 		}
+	}
+	
+	me.clusterStopTimes = function () {
+		log('stop_times clustern', 0);
 		
+		var useTrip = [];
+		for (var i = 0; i < tables.trips.length; i++) {
+			if (tables.trips[i].route_id == 155) {
+				useTrip[tables.trips[i].trip_id] = true;
+			}
+		}
+		
+		log('stop_times einlesen', 1);
+		var lines = readCSV(foldername + '/stop_times.txt', true, function (obj) { return useTrip[obj.trip_id] });
+		writeCSV('temp.csv', lines, 'utf8');
+		
+		/*
 		// Jetzt erst stop_times importieren
 		log('stop_times importieren', 1);
 		var lines = readCSV(foldername + '/stop_times.txt', true, true);
@@ -179,7 +195,7 @@ exports.GTFS = function (foldername) {
 		
 		fs.writeFileSync('temp.csv', temp.join('\r'), 'utf8');
 		
-		
+		*/
 		//'stop_times':      readCSV(foldername + '/stop_times.txt', true),
 	}
 	

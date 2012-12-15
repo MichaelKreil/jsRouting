@@ -289,26 +289,28 @@ function readCSV(filename, required, dontParseLines) {
 		var lines = file.split('\r');
 		
 		if (!dontParseLines) {
-			// Zeilen parsen
-			for (var i = 0; i < lines.length; i++) {
-				lines[i] = parseCSVLine(lines[i]);
-			}
-			
 			// Kopfzeile extrahieren;
-			var head = lines.shift();
+			var head = parseCSVLine(lines.shift());
 			
-			// Zeilen werden zu Objekten
+			// Zeilen parsen
 			log('Zeilen parsen', 2);
 			var n = 0;
 			for (var i = 0; i < lines.length; i++) {
 				var line = lines[i];
+				
 				if (line != '') {
+					line = parseCSVLine(line);
+					
 					var obj = {};
 					for (var j = 0; j < head.length; j++) {
 						obj[head[j]] = line[j];
 					}
 					lines[n] = obj;
 					n++;
+					
+					if (n % 100000 == 0) {
+						log('Zeile Nr.'+n, 3);
+					}
 				}
 			}
 			

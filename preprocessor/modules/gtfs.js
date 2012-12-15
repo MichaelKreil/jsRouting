@@ -203,18 +203,18 @@ exports.GTFS = function (foldername) {
 	
 	// Lese GTFS-Daten ... alle, außer "stop_times" ... denn die ist so fett, dass sie später geparsed wird.
 	var tables = {
-		'agency':          readCSV(foldername + '/agency.txt', true),
-		'calendar_dates':  readCSV(foldername + '/calendar_dates.txt'),
-		'calendar':        readCSV(foldername + '/calendar.txt', true),
-		'fare_attributes': readCSV(foldername + '/fare_attributes.txt'),
-		'fare_rules':      readCSV(foldername + '/fare_rules.txt'),
-		'feed_info':       readCSV(foldername + '/feed_info.txt'),
-		'frequencies':     readCSV(foldername + '/frequencies.txt'),
-		'routes':          readCSV(foldername + '/routes.txt', true),
-		'shapes':          readCSV(foldername + '/shapes.txt'),
-		'stops':           readCSV(foldername + '/stops.txt', true),
-		'transfers':       readCSV(foldername + '/transfers.txt'),
-		'trips':           readCSV(foldername + '/trips.txt', true)
+		'agency':          readCSV(foldername + '/agency.txt',         true),
+		'calendar_dates':  readCSV(foldername + '/calendar_dates.txt'      ),
+		'calendar':        readCSV(foldername + '/calendar.txt',       true),
+		'fare_attributes': readCSV(foldername + '/fare_attributes.txt'     ),
+		'fare_rules':      readCSV(foldername + '/fare_rules.txt'          ),
+		'feed_info':       readCSV(foldername + '/feed_info.txt'           ),
+		'frequencies':     readCSV(foldername + '/frequencies.txt'         ),
+		'routes':          readCSV(foldername + '/routes.txt',         true),
+		'shapes':          readCSV(foldername + '/shapes.txt'              ),
+		'stops':           readCSV(foldername + '/stops.txt',          true),
+		'transfers':       readCSV(foldername + '/transfers.txt'           ),
+		'trips':           readCSV(foldername + '/trips.txt',          true)
 	};
 	
 	// Jetzt die entsprechenden Felder konvertieren

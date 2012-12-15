@@ -327,6 +327,35 @@ function readCSV(filename, required, dontParseLines) {
 	}
 }
 
+function writeCSV(filename, data) {
+	var head = {};
+	var firstLine = [];
+	var headCount = 0;
+	
+	for (var i = 0; i < data.length; i++) {
+		var entry = data[i];
+		for (var key in entry) {
+			if (head[key] === undefined) {
+				firstLine.push(key);
+				head[key] = headCount;
+				headCount++;
+			}
+		}
+	}
+	
+	var lines = [firstLine.join(',')];
+	for (var i = 0; i < data.length; i++) {
+		var entry = data[i];
+		var line = new Array(headCount);
+		for (var key in entry) {
+			line[head[key]] = entry[key];
+		}
+		lines.push(line.join(','));
+	}
+	
+	fs.writeFileSync(filename, lines.join('\r'), 'utf8');
+}
+
 var tabs = '                              ';
 function log(msg, level) {
 	console.log(tabs.substr(0,level*3) + msg);

@@ -4,11 +4,11 @@ Ich habe den Hinweis bekommen, dass sich für die Analyse des Problems besonders
 
 Hier sind mal alle Verbindungen der U7:
 
-![Timetable.png](images/Timetable.png)
+![Timetable.png](https://raw.github.com/michomachine/jsRouting/master/Analyse/images/Timetable.png)
 
 Nimmt man nur die durchgehenden Verbindungen in eine Richtung und lässt sie alle gleichzeitig zum Zeitpunkt 0 starten, so ergibt sich folgendes Bild:
 
-![Abfahrtzeiten-U7](images/Abfahrtzeiten-U7.png)
+![Abfahrtzeiten-U7](https://raw.github.com/michomachine/jsRouting/master/Analyse/images/Abfahrtzeiten-U7.png)
 
 Wie man sieht, lassen sich die knapp 500 Verbindungen reduzieren auf 5 Gruppen.
 

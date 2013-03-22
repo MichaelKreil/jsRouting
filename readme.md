@@ -26,6 +26,8 @@ Es scheint bei vielen Nahverkehrs-GTFS-Datensätzen (nicht nur beim VBB) das Pro
 * Die Taktungen auf einer Route wird eigentlich in der frequencies.txt beschrieben. Da keine frequencies.txt angegeben ist, wird jede einzelne Fahrt gespeichert. Deswegen ist die stop_times.txt mit 6 Mio. Einträgen und 250MB auch so groß!
 * Der Fahrplan vieler Unternehmen ist vermutlich sekundengenau (z.B. für U-Bahnen). Angegeben wird er jedoch in Minuten. Dadurch kommt es zu Rundungsfehlern! Bedeutet: Manchmal benötigt eine U-Bahn zwischen zwei Stationen 1 Minute und manchmal benötigt sie auf der gleichen Strecke 2 Minuten. Dadurch lässt sich auf den ersten Blick kein "regulär getakteter Fahrplan" erzeugen
 
+Eine genauere Analyse befindet sich unter <https://github.com/MichaelKreil/jsRouting/tree/master/Analyse>.
+
 # Installation
 
 1. Repository holen
